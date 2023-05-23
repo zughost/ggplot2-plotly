@@ -5,10 +5,13 @@ format:
     toc: true
     lang: es
 ---
+
 # INTRODUCCION
-Este documento presenta un conjunto de visualizaciones de datos elaborados con paquetes de lenguaje R como ggplot 2, plotly y DT.
+
+## Este documento presenta un conjunto de visualizaciones de datos elaborados con paquetes de lenguaje R como ggplot 2, plotly y DT.
 
 # Carga de bibliotecas
+
 ```{r}
 #| label:  carga-biblioteca
 #| warning: false
@@ -18,11 +21,16 @@ library(tidyverse)
 library(DT)
 library(plotly)
 library(gapminder)
+library(ggplot2)
+library(palmerpenguins)
+library(ggthemes)
+library(hrbrthemes)
 ```
 
-# carga de datos
+# Carga de datos
 
 ## mpg
+
 ```{r}
 #| label: carga-datos-mpg
 #| warning: false
@@ -39,6 +47,7 @@ mpg |>
 ```
 
 ## diamonds
+
 ```{r}
 #| label: cargadatos-diamonds-mpg
 #| warning: false
@@ -56,6 +65,7 @@ diamonds |>
 ```
 
 ## gapminder
+
 ```{r}
 #| label: gapminder
 #| warning: false
@@ -74,6 +84,7 @@ diamonds |>
 ```
 
 ## Covid
+
 ```{r}
 #| label: carga de archivo CSV Covid
 #| warning: false
@@ -125,6 +136,7 @@ covid_general |>
 ```
 
 ## delitos en 2022 en Costa Rica
+
 ```{r}
 #| label: carga-Delitos-2022
 #| warning: false
@@ -145,4 +157,361 @@ delitos_2022 |>
       language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
     )
   )
+```
+
+# Opciones basicas de ggpplot 2 con variables adicionales
+
+```{r}
+#| label: Grafico-dispersion
+#| warning: false
+#| message: false
+#| code-fold: true
+
+# forma con pipes con variables adicionales
+mpg |>
+  ggplot(aes(x = displ, y = hwy, color = class, shape = class)) + 
+  geom_point() +
+  scale_shape_manual(values = c(0, 1, 2, 3, 4, 5, 6)) +
+  scale_color_manual(values = c("red", "blue", "green", "purple", "orange", "brown", "pink"))
+
+# Gráfico de dispersión de rendimiento en autopista vs rendimiento en ciudad
+# con tamaño de puntos correspondiente a la cilindrada
+mpg |>
+  ggplot(aes(x = hwy, y = cty, size = displ)) +
+  geom_point()
+  geom_smooth()
+```
+
+# opciones basicas de ggplot2
+
+De acuerdo con la gramatica de los graficos, todo grafico estadistico tiene tres componentes:
+
+1.  Datos (dataframe).
+2.  Mapeos de las columnas del dataframe a las propiedades visuales del grafico (x, y, color, tsamaño, forma, etc.)
+3.  Una o varias capaz con geometrias (geom_point(), geom_bar())
+
+```{r}
+#| labe: grafico_basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy)) +
+  geom_point()
+  
+
+```
+
+# Cargue el conjunto de datos penguins y genere un grafico de dispersion
+
+# que muestre la relacion: peso vs longitud de la aleta
+
+```{r}
+#| labe: grafico_basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+penguins |>
+  ggplot(aes(x = body_mass_g, y = flipper_length_mm)) +
+  geom_point()
+
+
+```
+
+```{r}
+#| labe: Variables_adicionales
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy, color = drv)) +
+  geom_point()
+```
+
+#Cargue el conjunto de datos de las variables en penguins sex, Tamaño
+
+```{r}
+#| labe: grafico_basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+penguins |>
+  ggplot(aes(x = body_mass_g, y = flipper_length_mm, color = sex)) +
+  geom_point()
+```
+
+```{r}
+#| labe: Variables_adicionales
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy, shape = class)) +
+  geom_point()
+```
+
+```{r}
+#| label: grafico-basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy, shape = drv, color = class)) +
+  geom_point() +
+  scale_shape_manual(values = c(0, 1, 2, 3, 4, 5, 6)) +
+  scale_color_manual(values = c("red", "blue", "green", "purple", "orange", "brown", "pink")) 
+```
+
+## Capas adicionales
+
+```{r}
+#| label: grafico-basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+```
+
+```{r}
+#| label: grafico-basico
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+```
+
+# Paneles (facets)
+
+v
+
+```{r}
+#| label: facet-wrap
+
+mpg |>
+  ggplot(aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap (~ class, ncol = 2)
+```
+
+## plotly
+
+```{r}
+#| label: plotly
+#| warning: false
+#| message: true
+#| code-fold: true
+
+# Gráfico ggplot2
+grafico_ggplot2 <-
+  mpg |>
+  ggplot(aes(x = displ, y = hwy, color = drv)) +
+  geom_point(aes(
+    # datos que se muestran al colocar el ratón sobre un punto
+    text = paste0(
+      "Modelo: ", manufacturer, " ", model, " ", year, "\n",
+      "Cilindrada: ", displ, " l", "\n",
+      "Rendimiento en autopista: ", hwy, " mpg", "\n",
+  "Tipo de tracción: ", drv, "\n",
+      "tipo de transmision: ", trans 
+    )
+  )) +
+  geom_smooth() +
+  ggtitle("Cilindrada vs rendimiento en autopista") +
+  xlab("Cilindrada (l)") +
+  ylab("Rendimiento en autopista (mpg)") +
+  labs(subtitle = "Datos de 38 modelos de automóviles de años entre 1999 y 2008",
+       caption = "Fuente: United States Environmental Protection Agency (EPA)",
+       color = "Tipo de tracción") +
+  theme_ipsum()
+
+# Gráfico plotly
+ggplotly(grafico_ggplot2, tooltip = "text") |> 
+  config(locale = 'es') # para mostrar los controles en español
+```
+
+# tipos de graficos
+
+## histogramas
+
+```{r}
+#| label: histogramas
+#| warning: false
+#| message: false
+#| code-fold: true
+
+histograma_ggplot2 <- 
+  gapminder |>
+  filter(year == 2007) |>
+  ggplot(
+    aes(x = gdpPercap, fill = continent)) +
+  geom_histogram(
+     aes(
+      text = paste0(
+        "Continente: ", after_stat(fill), "\n",
+        "PIB per cápita (valor medio del rango): $", round(after_stat(x), 2), "\n",
+        "Frecuencia: ", after_stat(count)
+      ),
+       y = after_stat(density) 
+    ),
+    bins = 10
+  ) +
+  ggtitle("Distribución del PIB per cápita en 2007") +
+  xlab("PIB per cápita ($ EE.UU.)") +
+  ylab("Densidad") +
+  labs(subtitle = "Datos de 140 países", caption = "Fuente: Gapminder.org", fill = "Continente") +
+  theme_economist()
+
+ggplotly(histograma_ggplot2, tooltip = "text") |>
+  config(locale = "es")
+  
+```
+
+## graficos de caja
+
+```{r}
+#| label: box_plot
+#| warning: false
+#| message: false
+#| code-fold: true
+
+grafico_caja_ggplot2 <-
+gapminder |>
+  filter(year == 2007) |>
+ggplot(aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  ggtitle("Distribución del PIB per cápita en 2007") +
+  ylab("PIB per cápita ($ EE.UU.)") +
+  labs(subtitle = "Datos de 140 países", caption = "Fuente: Gapminder.org") +
+  theme_economist()
+
+
+ggplotly(grafico_caja_ggplot2) |> 
+  config(locale = 'es')
+```
+
+## graficos de barra
+
+```{r}
+#| label: grafico_barra
+#| warning: false
+#| message: false
+#| code-fold: true
+
+grafico_barras_ggplot2 <-
+gapminder |>
+  filter(year == 2007) |>
+```
+
+```{r}
+```
+
+```{r}
+ggplot(aes(x = fct_infreq(continent))) +
+  geom_bar(
+    aes(
+      text = paste0(
+        "Cantidad de países: ", after_stat(count)
+      )
+    )    
+  ) +
+   ggtitle("Cantidad de países por continente") +
+  xlab("Continente") +
+  ylab("Cantidad de países") +
+  labs(caption = "Fuente: Gapminder.org") +
+  theme_economist()
+
+ggplotly(grafico_barras_ggplot2, tooltip = "text") |>
+  config(locale = 'es')
+```
+
+# contruir un grafico de barras que muestre la cantidad de carros por clase en el conjunto de datos mpg
+
+```{r}
+#| label: grafico_barra_carros
+#| warning: false
+#| message: false
+#| code-fold: true
+
+mpg |> 
+  ggplot(aes(x = fct_infreq(class))) +
+  geom_bar()
+
+```
+
+# Gráfico de barras con promedio de esperanza de vida
+
+```{r}
+#| label: grafico_barra_espereanza_vida
+#| warning: false
+#| message: false
+#| code-fold: true
+
+grafico_barras_ggplot2 <-
+  gapminder |>
+  filter(year == 2007) |>
+  ggplot(aes(x = fct_infreq(continent), y = lifeExp)) +
+  geom_bar(
+    stat = "summary", 
+    fun.y = "mean",
+    aes(
+      text = paste0(
+        "Promedio de esperanza de vida: ", round(after_stat(y), 2)
+      )
+    )
+  ) +
+  ggtitle("Promedio de esperanza de vida por continente en 2007") +
+  xlab("Continente") +
+  ylab("Promedio de esperanza de vida") +
+  labs(caption = "Fuente: Gapminder.org") +
+  theme_economist()
+
+ggplotly(grafico_barras_ggplot2, tooltip = "text") |>
+  config(locale = 'es')
+```
+
+# Gráfico de barras sin transformaciones estadisticas con población de países
+
+```{r}
+#| label: grafico_barra_sin_transformaciones_estadisticas
+#| warning: false
+#| message: false
+#| code-fold: true
+
+grafico_barras_ggplot2 <-
+gapminder |>
+  filter(year == 2007 & continent == "Americas") |>
+  ggplot(aes(x = reorder(country, pop), y = pop/1000000)) +
+  geom_col(
+    aes(
+      text = paste0(
+        "País: ", country, "\n",
+        "Población (millones de habitantes): ", round(pop/1000000, 2)
+      )
+    )
+  ) +
+  coord_flip() + # para mostrar barras horizontales
+  ggtitle("Población de países de América en 2007") +
+  xlab("País") +
+  ylab("Población (millones de habitantes)") +
+  labs(caption = "Fuente: Gapminder.org") +
+  theme_economist()
+
+ggplotly(grafico_barras_ggplot2, tooltip = "text") |> 
+  config(locale = 'es')
 ```
